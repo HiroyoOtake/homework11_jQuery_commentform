@@ -16,23 +16,59 @@
 			font-size: 14px;
 			line-height: 1;
 		}
+		#nameError {
+			color: red;
+		}
+		#commentError {
+			color: red;
+		}
 		</style>
 
 		<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 		<script>
 		$(function () {
+			$.get('comment.php',
+				function (data) {
+					$("#commentList").html(data);
+					$("input[name=name]").val("");
+					$("textarea[name=comment]").val("");
+				}
+			);
 			$(".btn").click(function(){
-				var name = $("[name=name]").val();
-				var comment  = $("[name=comment]").val();
+				$("#nameError").html("");
+				$("#commentError").html("");
+				var name = $("input[name=name]").val();
+				var comment  = $("textarea[name=comment]").val();
+				var errorexist = false;
+				if (name === "")
+				{
+					$("#nameError").html("お名前を入力して下さい。");
+					errorexist = true;
+				} 
+				if (comment === "")
+				{
+					$("#commentError").html("コメントを入力して下さい。");
+					errorexist = true;
+				} 
+
+				if (!errorexist)
+				{
 				$.post('post.php',
 					{
 						"name": name,
 						"comment": comment,
 					},
 					function (data) {
-						console.log(data);
+						$.get('comment.php',
+							function (data) {
+								$("#commentList").html(data);
+								$("input[name=name]").val("");
+								$("textarea[name=comment]").val("");
+							}
+						);
 					}
 				);
+				}
 			});
 		});
 		</script>
@@ -42,11 +78,13 @@
 		<form>
 			お名前:<br>
 			<input type="text" name="name"><br>
+			<div id="nameError"></div>
 			コメント:<br>
 			<textarea  name="comment" rows="7" cols="40"></textarea><br>
-			<button name="transmission" class="btn">送信</button>
+			<div id="commentError"></div>
+			<button name="transmission" type="button" class="btn">送信</button>
 		</form>
 		<h3>コメント一覧</h3>
-		<p>コメントはありません。</p>
+		<p id="commentList">コメントはありません。</p>
 	</body>
 </html>

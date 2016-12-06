@@ -1,9 +1,5 @@
 <?php
 
-$name = $_POST['name'];
-$comment = $_POST['comment'];
-$createdAt = date("Y/m/d H:i");
-
 define('DSN','mysql:host=localhost;dbname=ajax;charset=utf8;');
 define('USER','root');
 define('PASSWORD','root');
@@ -17,11 +13,15 @@ try {
 		exit;
 }
 
-$sql = "insert into commentList (name, comment, createdAt) values (:name,:comment,:createdAt)";
+$sql = "select * from commentList ORDER BY createdAt DESC";
 $stmt = $dbh->prepare($sql);
-$stmt->bindParam(":name", $name);
-$stmt->bindParam(":comment", $comment);
-$stmt->bindParam(":createdAt", $createdAt);
 $stmt->execute();
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
+
+		<?php foreach ($rows as $comment): ?> 
+			<hr>
+			<?php echo $comment['name']; ?> <?php echo $comment['createdAt']; ?><br>
+			<?php echo $comment['comment']; ?>
+		<?php endforeach ?>
